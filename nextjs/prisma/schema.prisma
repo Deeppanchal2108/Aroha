@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  firstName          String
+  lastName           String?
+  email              String   @unique
+  phone              String?
+  profileImage       String?
+  notificationTokens String[]
+
+  roles         Role[]
+  patients      Patient?
+  doctors       Doctor?
+  notifications Notification[]
+}
+
+model Role {
+  id   String @id @default(uuid())
+  role String @unique
+
+  users User[]
+}
+
+model Hospital {
+  id             String  @id @default(uuid())
+  name           String
+  website        String?
+  thumbnailImage String?
+  addressLine1   String
+  addressLine2   String?
+  city           String?
+  country        String?
+  rating         Int?
+  pincode        String?
+
+  doctors  Doctor[]
+  services Service[]
+}
+
+model Service {
+  id   String @id @default(uuid())
+  name String @unique
+
+  hospitals        Hospital[]
+  doctorCharges    DoctorCharges[]
+  appointmentSlots AppointmentSlot[]
+}
+
+model Doctor {
+  id            String  @id @default(uuid())
+  licenseNumber String?
+  gender        String?
+  experience    Int?
+  about         String?
+  rating        Int?
+  approved      Boolean
+  hospitalId    String?
+
+  user            User              @relation(fields: [id], references: [id])
+  hospital        Hospital?         @relation(fields: [hospitalId], references: [id])
+  charges         DoctorCharges[]
+  appointments    Appointment[]
+  prescriptions   Prescription[]
+  AppointmentSlot AppointmentSlot[]
+}
+
+model DoctorCharges {
+  id        String @id @default(uuid())
+  serviceId String
+  charge    Float
+  doctorId  String
+
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+}
+
+model Patient {
+  id           String    @id @default(uuid())
+  dob          DateTime?
+  gender       String?
+  bloodType    String?
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  country      String?
+  pincode      String?
+  allergies    Json?
+
+  user                    User                     @relation(fields: [id], references: [id])
+  emergencyContacts       EmergencyContact[]
+  mentalHealthAssessments MentalHealthAssessment[]
+  prescriptions           Prescription[]
+  medications             Medication[]
+  appointments            Appointment[]
+}
+
+model EmergencyContact {
+  id        String @id @default(uuid())
+  patientId String
+  relation  String
+  phone     String
+
+  patient Patient @relation(fields: [patientId], references: [id])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  amount        Decimal
+  paymentStatus PaymentStatus
+  orderId       String
+  currency      String
+  transactionId String
+
+  Appointment Appointment[]
+}
+
+enum PaymentStatus {
+  PENDING
+  FAILED
+  SUCCESS
+}
+
+model AppointmentSlot {
+  id            String       @id @default(uuid())
+  doctorId      String
+  serviceId     String
+  startTime     DateTime
+  endTime       DateTime
+  scheduleType  ScheduleType
+  repeatDays    Json?
+  specificDates Json?
+  omitDates     Json?
+
+  doctor       Doctor        @relation(fields: [doctorId], references: [id])
+  service      Service       @relation(fields: [serviceId], references: [id])
+  appointments Appointment[]
+}
+
+enum ScheduleType {
+  SPECIFIC_DATE
+  RECURRING
+}
+
+model Appointment {
+  id                String            @id @default(uuid())
+  patientId         String
+  appointmentSlotId String
+  paymentId         String
+  date              DateTime
+  status            AppointmentStatus
+  conferenceLink    String?
+  note              String?
+
+  patient         Patient         @relation(fields: [patientId], references: [id])
+  appointmentSlot AppointmentSlot @relation(fields: [appointmentSlotId], references: [id])
+  payment         Payment         @relation(fields: [paymentId], references: [id])
+  prescriptions   Prescription[]
+  Doctor          Doctor?         @relation(fields: [doctorId], references: [id])
+  doctorId        String?
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELED_BY_DOCTOR
+  CANCELED_BY_PATIENT
+}
+
+model MentalHealthAssessment {
+  id              String  @id @default(uuid())
+  patientId       String
+  responses       Json
+  aiAnalysis      String?
+  recommendations String?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+}
+
+model Prescription {
+  id            String   @id @default(uuid())
+  patientId     String
+  doctorId      String
+  appointmentId String
+  date          DateTime
+  imageUrl      String?
+  instruction   String?
+
+  patient     Patient      @relation(fields: [patientId], references: [id])
+  doctor      Doctor       @relation(fields: [doctorId], references: [id])
+  appointment Appointment  @relation(fields: [appointmentId], references: [id])
+  medications Medication[]
+}
+
+model Medication {
+  id             String @id @default(uuid())
+  patientId      String
+  prescriptionId String
+  name           String
+  dosage         String
+  timePeriod     Int
+  frequency      Int
+
+  prescription    Prescription     @relation(fields: [prescriptionId], references: [id])
+  patient         Patient          @relation(fields: [patientId], references: [id])
+  medicationTimes MedicationTime[]
+}
+
+model MedicationTime {
+  id           String   @id @default(uuid())
+  medicationId String
+  time         DateTime
+
+  medication Medication @relation(fields: [medicationId], references: [id])
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+  tag         String
+  timestamp   DateTime
+  title       String
+  description String
+  read        Boolean
+
+  user User @relation(fields: [userId], references: [id])
+}
