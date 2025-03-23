@@ -1,11 +1,10 @@
 import React from 'react'
+import AuthPage from '../_component/Auth'
 
-function page() {
-  return (
-    <div>
-      Umm inside the signup page auth
-    </div>
-  )
+export default function LoginPage() {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <AuthPage login={false} />
+        </div>
+    )
 }
-
-export default page
