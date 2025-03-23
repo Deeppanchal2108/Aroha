@@ -1,28 +1,39 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+"use client";
+import { useEffect, useState } from "react";
+import { Session } from "@supabase/supabase-js";
+import { createClient } from "@/supabase/client";
 import Services from '@/components/landingPage/Services'
 import Hero from '@/components/landingPage/Hero'
 import Navbar from '@/components/landingPage/Navbar'
 import Footer from '@/components/landingPage/Footer'
 
-export default async function Page() {
-  const supabase = createServerComponentClient({ cookies });
+export default  function Page() {
+  const [session, setSession] = useState<Session | null>(null);
+  const supabase = createClient();
+  useEffect(() => {
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data?.session);
+    };
 
-  const { data } = await supabase.auth.getSession();
-  const session = data.session;
-  console.log("Session : ",session);
+    getSession();
+  }, []);
+  console.log("Session ",session)
   if (session) {
     return (
-      <div className="min-h-screen p-4">
-        <h1 className="text-2xl font-bold mb-4">Session Information</h1>
-        <div className="space-y-2">
-          <p>User ID: {session.user.id}</p>
-          <p>Email: {session.user.email}</p>
-          <p>Last Sign In: {new Date(session.user.last_sign_in_at || '').toLocaleString()}</p>
-          <pre className="bg-gray-100 p-4 rounded-md mt-4">
-            {JSON.stringify(session, null, 2)}
-          </pre>
-        </div>
+      <div>
+        {session ? (
+          <div>
+            <h2>Logged in as:</h2>
+            <p><strong>Email:</strong> {session.user.email}</p>
+            <p><strong>User ID:</strong> {session.user.id}</p>
+            <p><strong>Role:</strong> {session.user.role || "Not Set"}</p>
+            <p><strong>Metadata:</strong> {JSON.stringify(session.user.user_metadata, null, 2)}</p>
+            <p><strong>Access Token:</strong> {session.access_token}</p>
+          </div>
+        ) : (
+          <p>Not logged in</p>
+        )}
       </div>
     )
   }
