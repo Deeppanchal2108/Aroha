@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { login } from "../_actions";
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginForm() {
     const [error, setError] = useState<string | null>(null);
@@ -42,12 +43,11 @@ export default function LoginForm() {
                 >
                     Login
                 </button>
-                <a
-                    className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-                    href="#"
-                >
-                    Forgot Password?
-                </a>
+                <div className="text-center">
+                    <Link href="/signup" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                        Don't have an account? Sign Up
+                    </Link>
+                </div>
             </form>
         </div>
     );
