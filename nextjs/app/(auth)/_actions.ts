@@ -5,32 +5,29 @@ import { createClient } from "@/supabase/server";
 import { redirect } from "next/navigation";
 
 
-
 export async function signUp(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const firstName = formData.get("firstName") as string;
   const lastName = formData.get("lastName") as string;
 
-
   const existingUser = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
+    where: { email },
   });
 
   if (existingUser) {
-    // Redirect to login page if user already exists
     redirect("/login");
   }
 
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  // Create user in Supabase Auth
-  const { data, error } = await supabase.auth.admin.createUser({
+  // Sign up user in Supabase Auth
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    email_confirm: true, // Auto-confirm email
+    options: {
+      data: { firstName, lastName, role: "PATIENT" }, // Correct metadata storage
+    },
   });
 
   if (error) {
@@ -38,23 +35,26 @@ export async function signUp(formData: FormData) {
   }
 
   const userId = data.user?.id;
+  if (!userId) {
+    return { error: "Failed to retrieve user ID" };
+  }
 
   // Save user in Prisma database
   await prisma.user.create({
     data: {
-      id: userId!,
+      id: userId,
       email,
       firstName,
       lastName,
       roles: {
-        connect: [{ role: "PATIENT" }], // Assign default role
-      },
+        connect: [{ role: "PATIENT" }], 
+      }, 
     },
   });
 
-  // Redirect after successful signup
   redirect("/");
 }
+
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;

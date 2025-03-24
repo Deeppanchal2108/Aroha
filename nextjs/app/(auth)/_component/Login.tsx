@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import { login } from "../_actions";
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     async function handleSubmit(formData: FormData) {
         const res = await login(formData);
         if (res?.error) {
             setError(res.error);
+        } else {
+            router.push('/');
         }
     }
 

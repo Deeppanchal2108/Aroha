@@ -49,7 +49,7 @@ export async function updateSession(request: NextRequest) {
         url.pathname = '/login'
         return NextResponse.redirect(url)
     }
-    if (user && request.nextUrl.pathname !== '/' && !request.nextUrl.pathname.startsWith('/channel')) {
+    if (user && request.nextUrl.pathname !== '/' ) {
         if (user.user_metadata.role === "PATIENT" && (request.nextUrl.pathname.startsWith('/login') ||
             request.nextUrl.pathname.startsWith('/signup') || request.nextUrl.pathname.startsWith('/doctor'))) {
             const url = request.nextUrl.clone()

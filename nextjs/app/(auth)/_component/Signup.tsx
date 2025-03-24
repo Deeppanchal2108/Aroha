@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useState } from "react";
 import { signUp } from "../_actions";
 
@@ -51,12 +51,12 @@ export default function SignupForm() {
                 >
                     Sign Up
                 </button>
-                <a
+                <Link
                     className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-                    href="#"
+                    href="/login"
                 >
                     Already have an account?
-                </a>
+                </Link>
             </form>
         </div>
     );
