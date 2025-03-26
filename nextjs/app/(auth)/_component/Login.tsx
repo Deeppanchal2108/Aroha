@@ -1,54 +1,98 @@
-"use client";
-
+"use client"
 import { useState } from "react";
-import { login } from "../_actions";
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Mail, Lock } from "lucide-react";
 
-export default function LoginForm() {
+const LoginForm = () => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
 
-    async function handleSubmit(formData: FormData) {
-        const res = await login(formData);
-        if (res?.error) {
-            setError(res.error);
-        } else {
-            router.push('/');
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Basic validation
+        if (!email || !password) {
+            setError("Please fill in all fields");
+            return;
         }
-    }
+
+        // Here you would typically handle the login logic
+        // For now, just clear any errors and show a mock login attempt
+        setError(null);
+        console.log("Login attempt with:", { email, password });
+    };
 
     return (
-        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Login</h2>
-            <form action={handleSubmit} className="flex flex-col gap-4">
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    required
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    required
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                />
-                {error && <p className="text-red-500 text-sm italic">{error}</p>}
-                <button
-                    type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
-                    Login
-                </button>
-                <div className="text-center">
-                    <Link href="/signup" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-                        Don't have an account? Sign Up
-                    </Link>
-                </div>
-            </form>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+            <div className="w-full max-w-md">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-xl text-center">Login</CardTitle>
+                        <CardDescription className="text-center">
+                            Enter your credentials to continue
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="name@example.com"
+                                        className="pl-10"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Password</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        className="pl-10"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            {error && (
+                                <div className="p-3 text-sm bg-red-50 border border-red-200 text-red-600 rounded">
+                                    {error}
+                                </div>
+                            )}
+
+                            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                                Sign in
+                            </Button>
+                        </form>
+                    </CardContent>
+                    <CardFooter className="flex justify-center">
+                        <p className="text-sm text-gray-600">
+                            Don't have an account?{" "}
+                            <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
+                                Sign up
+                            </a>
+                        </p>
+                    </CardFooter>
+                </Card>
+            </div>
         </div>
     );
-}
+};
+
+export default LoginForm;

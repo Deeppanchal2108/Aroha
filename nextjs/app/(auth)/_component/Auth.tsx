@@ -8,7 +8,7 @@ interface AuthPageProps {
 
 export default function AuthPage({ login }: AuthPageProps) {
     return (
-        <div className='auth-container'>
+        <div className='w-full h-screen '>
             {login ? <LoginForm/>: <SignupForm />}
         </div>
     )

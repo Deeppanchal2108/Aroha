@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
+    "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-radio-group": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.2",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.6.1",
