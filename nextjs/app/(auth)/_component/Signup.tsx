@@ -3,10 +3,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from 'next/navigation';
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, User } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { signUp } from "../_actions";
+import Link from "next/link";
 const SignupForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -14,8 +16,8 @@ const SignupForm = () => {
     const [lastName, setLastName] = useState("");
     const [userType, setUserType] = useState("patient");
     const [error, setError] = useState<string | null>(null);
-
-    const handleSubmit = (e: React.FormEvent) => {
+ const router = useRouter();
+    const handleSubmit  = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Basic validation
@@ -32,8 +34,16 @@ const SignupForm = () => {
         formData.append("userType", userType);
         // Here you would typically handle the signup logic
         setError(null);
-       
-        
+
+        const result =await signUp(formData);
+        if(result.error){
+            setError(result.error);
+        }
+        else {
+            router.push('/login');
+        }
+
+
     };
 
     return (
@@ -118,11 +128,11 @@ const SignupForm = () => {
                                     className="flex space-x-4"
                                 >
                                     <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="patient" id="patient" />
+                                        <RadioGroupItem value="PATIENT" id="patient" />
                                         <Label htmlFor="patient">Patient</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="doctor" id="doctor" />
+                                        <RadioGroupItem value="DOCTOR" id="doctor" />
                                         <Label htmlFor="doctor">Doctor</Label>
                                     </div>
                                 </RadioGroup>
@@ -142,9 +152,9 @@ const SignupForm = () => {
                     <CardFooter className="flex justify-center">
                         <p className="text-sm text-gray-600">
                             Already have an account?{" "}
-                            <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
+                            <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
                                 Login
-                            </a>
+                            </Link>
                         </p>
                     </CardFooter>
                 </Card>

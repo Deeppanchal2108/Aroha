@@ -3,15 +3,17 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from 'next/navigation';
 import { Label } from "@/components/ui/label";
 import { Mail, Lock } from "lucide-react";
-
+import { login } from "../_actions";
+import Link from "next/link";
 const LoginForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
-
-    const handleSubmit = (e: React.FormEvent) => {
+    const router = useRouter();
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Basic validation
@@ -19,11 +21,19 @@ const LoginForm = () => {
             setError("Please fill in all fields");
             return;
         }
-
-        // Here you would typically handle the login logic
-        // For now, just clear any errors and show a mock login attempt
+        const formdata = new FormData();
+        formdata.append("email", email);
+        formdata.append("password", password);
         setError(null);
-        console.log("Login attempt with:", { email, password });
+  
+        const res = await login(formdata);
+        if (res?.error) {
+            setError(res.error);
+        } else {
+            router.push('/');
+        }
+
+    
     };
 
     return (
@@ -84,9 +94,9 @@ const LoginForm = () => {
                     <CardFooter className="flex justify-center">
                         <p className="text-sm text-gray-600">
                             Don't have an account?{" "}
-                            <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
+                            <Link href="/signup" className="text-blue-600 hover:text-blue-800 font-medium">
                                 Sign up
-                            </a>
+                            </Link>
                         </p>
                     </CardFooter>
                 </Card>

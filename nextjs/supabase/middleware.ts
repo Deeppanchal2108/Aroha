@@ -53,7 +53,7 @@ export async function updateSession(request: NextRequest) {
         if (user.user_metadata.role === "PATIENT" && (request.nextUrl.pathname.startsWith('/login') ||
             request.nextUrl.pathname.startsWith('/signup') || request.nextUrl.pathname.startsWith('/doctor'))) {
             const url = request.nextUrl.clone()
-            url.pathname = '/'
+            url.pathname = '/patient'
             return NextResponse.redirect(url)
         }
 

@@ -10,7 +10,7 @@ export async function signUp(formData: FormData) {
   const password = formData.get("password") as string;
   const firstName = formData.get("firstName") as string;
   const lastName = formData.get("lastName") as string;
-
+  const role = formData.get("userType") as string;
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
@@ -26,7 +26,7 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
-      data: { firstName, lastName, role: "PATIENT" }, // Correct metadata storage
+      data: { firstName, lastName, role: role }, // Correct metadata storage
     },
   });
 
@@ -47,12 +47,12 @@ export async function signUp(formData: FormData) {
       firstName,
       lastName,
       roles: {
-        connect: [{ role: "PATIENT" }], 
+        connect: [{ role: role  }], 
       }, 
     },
   });
 
-  redirect("/");
+  redirect("/login");
 }
 
 
